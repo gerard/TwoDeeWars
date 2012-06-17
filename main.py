@@ -171,7 +171,10 @@ class Game(FloatLayout):
     }
 
     def on_touch_down(self, touch):
-        if self.game_over: return
+        if self.game_over:
+            if touch.x < 16 * 9 and touch.y > Window.size[1] - 24:
+                self.reset_state()
+            return
 
         self.touch_uids.append(touch.uid)
         if len(self.touch_uids) == 1:
@@ -202,6 +205,9 @@ class Game(FloatLayout):
         if self.last_touch_x == None:
             return
 
+        if self.touch_uids == []:
+            return
+
         if self.touch_uids[0] != touch.uid:
             return
 
@@ -214,7 +220,7 @@ class Game(FloatLayout):
 
     def on_touch_up(self, touch):
         if self.game_over: return
-        self.touch_uids.remove(touch.uid)
+        if self.touch_uids != []: self.touch_uids.remove(touch.uid)
 
     def draw_score(self, score):
         self.canvas.remove_group("score")
@@ -237,6 +243,15 @@ class Game(FloatLayout):
 
     def __init__(self):
         ret = super(Game, self).__init__()
+        self.sounds = dict()
+        self.sounds['firing'] = SoundLoader.load("sounds/firing.ogg")
+        self.sounds['enemy_death'] = SoundLoader.load("sounds/enemy_death.ogg")
+        self.sounds['game_over'] = SoundLoader.load("sounds/game_over.ogg")
+        self.reset_state()
+        return ret
+
+    def reset_state(self):
+        self.canvas.clear()
         self.dt = self.ticks = 0
         self.runtime = 0.0
         self.pew_list = []
@@ -250,13 +265,10 @@ class Game(FloatLayout):
         self.game_over = False
         self.game_over_toogle = 0
 
+        Clock.unschedule(self.toogle_score)
+        Clock.schedule_interval(self.update, 1.0/60)
         self.draw_score(str(0))
 
-        self.sounds = dict()
-        self.sounds['firing'] = SoundLoader.load("sounds/firing.ogg")
-        self.sounds['enemy_death'] = SoundLoader.load("sounds/enemy_death.ogg")
-        self.sounds['game_over'] = SoundLoader.load("sounds/game_over.ogg")
-        return ret
 
     def update(self, dt):
         self.ticks += 1
@@ -311,7 +323,6 @@ class Game(FloatLayout):
 
 class MyApp(App):
     def build(self):
-        Clock.schedule_interval(game.update, 1.0/60)
         return game
 
 
