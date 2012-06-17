@@ -130,7 +130,7 @@ class Enemy(Drawable):
         return False
 
     def destroy(self):
-        self.pos = (-100, 0)
+        self.pos = (-Window.size[0], 0)
         self.remove()
 
     def pygame_rect(self):
