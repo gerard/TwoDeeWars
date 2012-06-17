@@ -168,11 +168,17 @@ class Game(FloatLayout):
                                              [14, 17, 14, 12, 8, 12],
                                              [8, 12, 2, 12],
                                              [8, 12, 14, 2]],
+        'T': [[2, 22, 14, 22], [8, 22, 8, 2]],
+        'Y': [[2, 22, 8, 12], [14, 22, 8, 12], [8, 12, 8, 2]],
+        'C': [[14, 17, 14, 22, 8, 22], [8, 22, 2, 22, 2, 12],
+              [14,  7, 14,  2, 8,  2], [8,  2, 2,  2, 2, 12]],
+        'L': [[2, 22, 2, 2], [2, 2, 14, 2]],
+        'K': [[2, 2, 2, 22], [2, 12, 14, 2], [2, 12, 14, 22]],
     }
 
     def on_touch_down(self, touch):
         if self.game_over:
-            if touch.x < 16 * 9 and touch.y > Window.size[1] - 24:
+            if touch.x < 16 * len("CL1CK 2 R3TRY") and touch.y > Window.size[1] - 24:
                 self.reset_state()
             return
 
@@ -309,8 +315,10 @@ class Game(FloatLayout):
             e.update(dt, self.player.center_pos())
 
     def toogle_score(self, dt=0):
-        if self.game_over_toogle % 2 == 0:
+        if self.game_over_toogle % 4 == 0:
             self.draw_score("64M3 0V3R")
+        elif self.game_over_toogle % 4 == 2:
+            self.draw_score("CL1CK 2 R3TRY")
         else:
             self.draw_score(str(self.points))
         self.game_over_toogle += 1
