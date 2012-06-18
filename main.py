@@ -176,6 +176,9 @@ class Game(FloatLayout):
         'K': [[2, 2, 2, 22], [2, 12, 14, 2], [2, 12, 14, 22]],
     }
 
+    SCORE_WHERE_TOPLEFT     = 0
+    SCORE_WHERE_TOPRIGHT    = 1
+
     def on_touch_down(self, touch):
         if self.game_over:
             if touch.x < 16 * len("CL1CK 2 R3TRY") and touch.y > Window.size[1] - 24:
@@ -228,24 +231,35 @@ class Game(FloatLayout):
         if self.game_over: return
         if self.touch_uids != []: self.touch_uids.remove(touch.uid)
 
-    def draw_score(self, score):
-        self.canvas.remove_group("score")
-        shift = 0
+    def draw_score(self, score, where=SCORE_WHERE_TOPLEFT):
+        self.canvas.remove_group("score" + str(where))
+        if where == self.SCORE_WHERE_TOPLEFT:
+            shift = 0
+        elif where == self.SCORE_WHERE_TOPRIGHT:
+            shift = Window.size[0] - 16
+            score = score[::-1]
+        else:
+            print "Unknown position for score: %d" % where
+            return
+
         with self.canvas:
             for num in score:
-                if num not in self.bezier_numbers:
+                if num in self.bezier_numbers:
+                    for bezier_points in self.bezier_numbers[num]:
+                        bezier_points_shifted = []
+                        for i in range(len(bezier_points)):
+                            if i % 2 == 0:
+                                bezier_points_shifted.append(bezier_points[i] + shift)
+                            else:
+                                bezier_points_shifted.append(Window.size[1] - 24 + bezier_points[i])
+                        Bezier(points=bezier_points_shifted, group="score" + str(where))
+                if where == self.SCORE_WHERE_TOPLEFT:
                     shift += 16
-                    continue
-
-                for bezier_points in self.bezier_numbers[num]:
-                    bezier_points_shifted = []
-                    for i in range(len(bezier_points)):
-                        if i % 2 == 0:
-                            bezier_points_shifted.append(bezier_points[i] + shift)
-                        else:
-                            bezier_points_shifted.append(Window.size[1] - 24 + bezier_points[i])
-                    Bezier(points=bezier_points_shifted, group="score")
-                shift += 16
+                elif where == self.SCORE_WHERE_TOPRIGHT:
+                    shift -= 16
+                else:
+                    print "Unknown position for score: %d" % where
+                    return
 
     def __init__(self):
         ret = super(Game, self).__init__()
@@ -253,6 +267,8 @@ class Game(FloatLayout):
         self.sounds['firing'] = SoundLoader.load("sounds/firing.ogg")
         self.sounds['enemy_death'] = SoundLoader.load("sounds/enemy_death.ogg")
         self.sounds['game_over'] = SoundLoader.load("sounds/game_over.ogg")
+        self.top_points = 0
+        self.points = 0
         self.reset_state()
         return ret
 
@@ -267,9 +283,13 @@ class Game(FloatLayout):
         self.player.update(self.dt)
         self.last_touch = None
         self.touch_uids = []
-        self.points = 0
         self.game_over = False
         self.game_over_toogle = 0
+
+        if self.points > self.top_points:
+            self.top_points = self.points
+        self.draw_score(str(self.top_points), where=self.SCORE_WHERE_TOPRIGHT)
+        self.points = 0
 
         Clock.unschedule(self.toogle_score)
         Clock.schedule_interval(self.update, 1.0/60)
