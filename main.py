@@ -188,7 +188,7 @@ class Game(FloatLayout):
 
     def on_touch_down(self, touch):
         if self.game_over:
-            if touch.x < 16 * len("CL1CK 2 R3TRY") and touch.y > Window.size[1] - 24:
+            if touch.x < 16 * len("CL1CK 2 R3TRY") and touch.y > Window.size[1] - 48:
                 self.reset_state()
             return
 
@@ -216,7 +216,10 @@ class Game(FloatLayout):
                 pass
 
     def on_touch_move(self, touch):
-        if self.game_over: return
+        if self.game_over:
+            if touch.x < 16 * len("CL1CK 2 R3TRY") and touch.y > Window.size[1] - 48:
+                self.reset_state()
+            return
 
         if self.last_touch_x == None:
             return
