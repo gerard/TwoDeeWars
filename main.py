@@ -48,14 +48,21 @@ class Player(Drawable):
         super(Player, self).__init__(canvas, self.__class__.__name__)
         self.size = (size, size)
         self.pos = (100, Window.size[1]/2 - size/2)
+        self.lifes = 3
 
     def update(self, dt):
         super(Player, self).update(dt)
+        (px, py) = self.pos
+        (sx, sy) = self.size
         with self.canvas:
-            Triangle(points=[self.pos[0], self.pos[1],
-                             self.pos[0] + self.size[0], self.pos[1] + self.size[1] / 2,
-                             self.pos[0], self.pos[1] + self.size[1]],
-                     group=self.group_name)
+            Bezier(points=[px, py, px + sx, py + sy/2], group=self.group_name)
+            Bezier(points=[px + sx, py + sy/2, px, py + sy], group=self.group_name)
+            Bezier(points=[px, py + sy, px, py], group=self.group_name)
+
+            for i in range(self.lifes):
+                Bezier(points=[px, py + i * sy/3, px + sx/3, py + i * sy/3 + sy/6], group=self.group_name)
+                Bezier(points=[px + sx/3, py + i * sy/3 + sy/6, px, py + (i+1) * sy/3], group=self.group_name)
+                Bezier(points=[px, py + (i+1) * sy/3, px, py + i * sy/3], group=self.group_name)
 
     def move_up(self):
         if self.pos[1]:
@@ -279,7 +286,7 @@ class Game(FloatLayout):
         self.pew_list = []
         self.enemy_list = []
         self.last_pew = -10.0
-        self.player = Player(50, self.canvas)
+        self.player = Player(60, self.canvas)
         self.player.update(self.dt)
         self.last_touch = None
         self.touch_uids = []
