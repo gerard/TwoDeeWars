@@ -47,7 +47,7 @@ class Player(Drawable):
     def __init__(self, size, canvas):
         super(Player, self).__init__(canvas, self.__class__.__name__)
         self.size = (size, size)
-        self.pos = (100, 100)
+        self.pos = (100, Window.size[1]/2 - size/2)
 
     def update(self, dt):
         super(Player, self).update(dt)
