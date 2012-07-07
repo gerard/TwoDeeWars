@@ -10,6 +10,7 @@ from kivy.clock import Clock
 from kivy.graphics import Color
 from kivy.graphics.vertex_instructions import Bezier, Triangle, Rectangle
 from kivy.uix.floatlayout import FloatLayout
+from kivy.config import Config
 
 import random
 import math
@@ -276,11 +277,14 @@ class Game(FloatLayout):
 
     def __init__(self):
         ret = super(Game, self).__init__()
+        Config.adddefaultsection('records')
+        Config.setdefault('records', 'top_points', '0')
+
         self.sounds = dict()
         self.sounds['firing'] = SoundLoader.load("sounds/firing.ogg")
         self.sounds['enemy_death'] = SoundLoader.load("sounds/enemy_death.ogg")
         self.sounds['game_over'] = SoundLoader.load("sounds/game_over.ogg")
-        self.top_points = 0
+        self.top_points = int(Config.get('records', 'top_points'))
         self.points = 0
         self.reset_state()
         return ret
@@ -301,6 +305,8 @@ class Game(FloatLayout):
 
         if self.points > self.top_points:
             self.top_points = self.points
+            Config.set('records', 'top_points', str(self.top_points))
+            Config.write()
         self.draw_score(str(self.top_points), where=self.SCORE_WHERE_TOPRIGHT)
         self.points = 0
 
