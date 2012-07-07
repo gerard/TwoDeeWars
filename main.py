@@ -150,7 +150,7 @@ class Enemy(Drawable):
             return 0
 
 class Game(FloatLayout):
-    # MAGIC!
+    # These characters are on a grid from [2, 2] to [14, 22]
     bezier_numbers = {
         '0': [[8, 2,  2, 2,  2, 12], [ 2, 12,  2, 22, 8, 22],
               [8, 2, 14, 2, 14, 12], [14, 12, 14, 22, 8, 22]],
@@ -181,6 +181,9 @@ class Game(FloatLayout):
               [14,  7, 14,  2, 8,  2], [8,  2, 2,  2, 2, 12]],
         'L': [[2, 22, 2, 2], [2, 2, 14, 2]],
         'K': [[2, 2, 2, 22], [2, 12, 14, 2], [2, 12, 14, 22]],
+        'U': [[ 2, 22,  2, 7], [ 2, 7,  2, 2, 8, 2],
+              [14, 22, 14, 7], [14, 7, 14, 2, 8, 2]],
+        'H': [[2, 2, 2, 22], [14, 2, 14, 22], [2, 12, 14, 12]],
     }
 
     SCORE_WHERE_TOPLEFT     = 0
@@ -348,7 +351,7 @@ class Game(FloatLayout):
         if self.game_over_toogle % 4 == 0:
             self.draw_score("64M3 0V3R")
         elif self.game_over_toogle % 4 == 2:
-            self.draw_score("CL1CK 2 R3TRY")
+            self.draw_score("T0UCH H3R3 2 R3TRY")
         else:
             self.draw_score(str(self.points))
         self.game_over_toogle += 1
