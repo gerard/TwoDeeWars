@@ -131,9 +131,9 @@ class Enemy(Drawable):
             Rectangle(pos=self.pos, size=self.size, group=self.group_name)
 
     def collision(self, pew):
-        if pew.pos[0] + 30 < self.pos[0]: return False
-        if pew.pos[0] + 30 > self.pos[0] + self.size[0]: return False
-        if self.pos[1] < pew.pos[1] < self.pos[1] + self.size[1]: return True
+        r = self.pygame_rect()
+        for i in range(30):
+            if r.collidepoint(pew.pos[0] + i, pew.pos[1]): return True
         return False
 
     def destroy(self):
