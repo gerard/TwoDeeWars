@@ -43,12 +43,19 @@ PACKAGENAME=$(basename `readlink -f .`)
 VERSION=`git describe | sed 's/^v//' | sed 's/-g.*//' | tr '-' '.'`
 [ `git status --porcelain | wc -l` -ne "0" ] && VERSION=$VERSION.9
 
+# This is needed so that build.py doesn't include all the files in the git
+# repo.  It also helps to have build specific files included.
+rm -rf build
+mkdir build
+cp -a main.py sounds build
+
 cd $PYTHONFORANDROID_DIST
-./build.py --dir /home/gerard/kivy/$PACKAGENAME \
+./build.py --dir /home/gerard/kivy/$PACKAGENAME/build \
            --name $PACKAGENAME \
            --package net.geeksynapse.geox.$PACKAGENAME \
            --version $VERSION $BUILDTYPE
 cd -
+rm -rf build
 
 if [ "$INSTALL" = "y" ]
 then
