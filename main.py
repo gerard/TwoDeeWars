@@ -14,6 +14,7 @@ from kivy.config import Config
 
 import random
 import math
+import time
 from pygame import Rect
 
 
@@ -27,6 +28,39 @@ def distance(a, b):
 def unit_vector_scaled(v, scale):
     modulo = math.sqrt(v[0]**2 + v[1]**2)
     return (v[0] * 5 / modulo, v[1] * 5 / modulo)
+
+class timeit(object):
+    def __init__(self, freq, verbose=False):
+        Config.adddefaultsection('debug')
+        Config.setdefault('debug', 'timeit', '0')
+
+        if int(Config.get('debug', 'timeit')) == 0:
+            self.freq = 0
+        else:
+            self.freq = freq
+            self.ncalls = 0
+            self.verbose = verbose
+
+    def __call__(self, f):
+        def timed(*args, **kw):
+            self.ncalls += 1
+            if self.ncalls % self.freq == 0:
+                ts = time.time()
+                result = f(*args, **kw)
+                te = time.time()
+
+                if self.verbose:
+                    print '%r (%r, %r) %2.8f sec' % (f.__name__, args, kw, te - ts)
+                else:
+                    print '%r %2.8f sec' % (f.__name__, te - ts)
+                return result
+            else:
+                return f(*args, **kw)
+
+        if self.freq == 0:
+            return f
+        else:
+            return timed
 
 class Drawable(object):
     def __init__(self, canvas, group_name):
@@ -315,14 +349,11 @@ class Game(FloatLayout):
         self.draw_score(str(0))
 
 
+    @timeit(60)
     def update(self, dt):
         self.ticks += 1
         self.runtime += dt
         self.dt = dt
-
-        if self.ticks % 120 == 0:
-            print "Enemy list len: %d" % len(self.enemy_list)
-            print "  Pew list len: %d" % len(self.pew_list)
 
         # Remove drawables that have disappeared from the screen
         self.pew_list = [x for x in self.pew_list if x.pos[0] < Window.size[0]]
