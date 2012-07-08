@@ -48,6 +48,8 @@ VERSION=`git describe | sed 's/^v//' | sed 's/-g.*//' | tr '-' '.'`
 rm -rf build
 mkdir build
 cp -a main.py sounds build
+mkdir build/.kivy
+cp -a config/$BUILDTYPE/config.ini build/.kivy
 
 cd $PYTHONFORANDROID_DIST
 ./build.py --dir /home/gerard/kivy/$PACKAGENAME/build \
