@@ -36,7 +36,8 @@ done
 echo "I: Making a $BUILDTYPE build"
 
 cd `dirname $0`
-PACKAGENAME=$(basename `readlink -f .`)
+PACKAGEDIR=$(readlink -f .)
+PACKAGENAME=$(basename $PACKAGEDIR)
 
 # Unfortunately the format of the version for apk is quite limited so we cannot
 # include the full git describe as it is.
@@ -52,7 +53,7 @@ mkdir build/.kivy
 cp -a config/$BUILDTYPE/config.ini build/.kivy
 
 cd $PYTHONFORANDROID_DIST
-./build.py --dir /home/gerard/kivy/$PACKAGENAME/build \
+./build.py --dir $PACKAGEDIR/build \
            --name $PACKAGENAME \
            --package net.geeksynapse.geox.$PACKAGENAME \
            --version $VERSION $BUILDTYPE
